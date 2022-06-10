@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:image_cropper/image_cropper.dart'
-show AndroidUiSettings, CropAspectRatioPreset, IOSUiSettings, ImageCropper;
+import 'package:image_cropper/image_cropper.dart';
 import 'package:my_tutor1/model/config.dart';
 
 import 'package:flutter/material.dart';
@@ -502,8 +501,8 @@ var _image;
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.camera,
-      maxHeight: 1800,
-      maxWidth: 1800,
+      maxHeight: 800,
+      maxWidth: 800,
     );
     if (pickedFile != null) {
       _image = File(pickedFile.path);

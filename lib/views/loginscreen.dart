@@ -1,17 +1,14 @@
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-
+import 'package:my_tutor1/model/config.dart';
+import 'package:my_tutor1/model/user.dart';
 import 'package:my_tutor1/views/registerpage.dart';
-
-
-
+import 'package:ndialog/ndialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-
-//import 'mainpage.dart';
+import 'package:http/http.dart' as http; // http.post
+import 'package:my_tutor1/views/mainscreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -237,14 +234,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    /*
-    ProgressDialog progressDialog = ProgressDialog(context,
-        message: const Text("Please wait.."), title: const Text("Login user"));
-    progressDialog.show();
+    
+   // ProgressDialog progressDialog = ProgressDialog(context,
+    //    message: const Text("Please wait.."), title: const Text("Login user"));
+    //progressDialog.show();
 
     String _email = _emailditingController.text;
     String _pass = _passEditingController.text;
-    http.post(Uri.parse(MyConfig.server + "/mytutor/php/login_user.php"),
+    http.post(Uri.parse(MyConfig.server + "/my_tutor1/xx/php/login_user.php"),
         body: {"email": _email, "password": _pass}).then((response) {
       print(response.body);
       var jsondata = jsonDecode(response.body);
@@ -256,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             fontSize: 14.0);
-        progressDialog.dismiss();
+     //   progressDialog.dismiss();
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -271,8 +268,8 @@ class _LoginScreenState extends State<LoginScreen> {
             timeInSecForIosWeb: 1,
             fontSize: 14.0);
       }
-      progressDialog.dismiss();
-    });*/
+     // progressDialog.dismiss();
+    });
   }
 
   void saveremovepref(bool value) async {
