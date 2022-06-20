@@ -20,6 +20,9 @@ class Subjects extends StatefulWidget {
 class _SubjectsState extends State<Subjects> {
   List<listSubjects> subjectList = <listSubjects>[]; //list subject is  dart (json convert dart)
   String titlecenter = "Loading";
+    String search = "";
+  TextEditingController searchController = TextEditingController();
+
     late double screenHeight, screenWidth, resWidth;
       var numofpage, curpage = 1;
   var color;
@@ -29,7 +32,7 @@ class _SubjectsState extends State<Subjects> {
   @override
   void initState() {
     super.initState();
-    _loadSubjects(1);
+    _loadSubjects(1, search);
   }
 
   @override
@@ -47,7 +50,22 @@ class _SubjectsState extends State<Subjects> {
 
     return Scaffold(
          backgroundColor: Colors.black,
-         
+          
+          appBar: AppBar(
+        title: const Text('Subjects'),
+       
+        backgroundColor: Color.fromARGB(60, 140, 139, 139),
+      
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              _loadSearchDialog();
+            },
+          ),
+          
+        ],
+      ),
        body:subjectList.isEmpty ?
         Center(
               child: Text(titlecenter,
@@ -145,7 +163,7 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
                       children: List.generate(subjectList.length, (index) {
                         return InkWell(
                           splashColor: Colors.amber,
-                         // onTap: () => {_loadProductDetails(index)},
+                          onTap: () => {_loadSubjectDetails(index)},
                             
 
                           child: Card(
@@ -215,7 +233,7 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
                     return SizedBox(
                       width: 40,
                       child: TextButton(
-                          onPressed: () => {_loadSubjects(index + 1)},
+                          onPressed: () => {_loadSubjects(index +1, "")},
                           child: Text(
                             (index + 1).toString(),
                             style: TextStyle(color: color),
@@ -229,14 +247,15 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
     
   }
 
-  void _loadSubjects(int pageno) {
+  void _loadSubjects(int pageno, String _search) {
     curpage = pageno;
     numofpage ?? 1;
     http.post(
         Uri.parse(MyConfig.server + "/my_tutor1/xx/php/load_subjects.php"),
         body: {
           'pageno': pageno.toString(),
-        
+          'search': _search,
+
         }).timeout(
       const Duration(seconds: 5),
       onTimeout: () {
@@ -268,4 +287,106 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
       }
     });
   }
+
+
+void _loadSearchDialog() {
+    searchController.text = "";
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return StatefulBuilder(
+            builder: (context, StateSetter setState) {
+              return AlertDialog(
+                title: const Text(
+                  "Search ",
+                ),
+                content: SizedBox(
+                  //height: screenHeight / 4,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                            labelText: 'Search',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0))),
+                      ),
+                   
+                    ],
+                  ),
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      search = searchController.text;
+                      Navigator.of(context).pop();
+                      _loadSubjects(1, search,);
+                    },
+                    child: const Text("Search"),
+                  )
+                ],
+              );
+            },
+          );
+        });
+  }
+
+ _loadSubjectDetails(int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            title: const Text(
+              "Subject Details",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: SingleChildScrollView(
+                child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: MyConfig.server +
+
+
+                       "/my_tutor1/xx/assets/courses/" +       //xampp htdocs
+                                     subjectList[index].subjectId.toString() +
+                                      '.png',
+                  fit: BoxFit.cover,
+                  width: resWidth,
+                  placeholder: (context, url) =>
+                      const LinearProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+                Text(
+                  subjectList[index].subjectName.toString(),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text("\nSubject Description: \n" +
+                       subjectList[index].subjectDesc.toString(),	textAlign: TextAlign.justify,
+ ),
+                  Text(" \nPrice: RM " +
+                      double.parse(  subjectList[index].subjectPrice.toString())
+                          .toStringAsFixed(2)),
+                  Text("\nSession: " +
+                        subjectList[index].subjectSessions.toString() +
+                      " units"),
+                  Text("\nRating: " +
+                        subjectList[index].subjectRating.toString()),
+                  
+                ]),
+              ],
+            )),
+           
+          );
+        });
+  }
+
+
+
+
 }

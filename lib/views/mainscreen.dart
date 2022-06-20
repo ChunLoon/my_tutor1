@@ -50,10 +50,7 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MyTutor'),
-        backgroundColor: Colors.transparent,
-      ),
+      
      
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.blueAccent,

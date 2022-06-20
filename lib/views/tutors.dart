@@ -46,7 +46,10 @@ class _TutorsState extends State<Tutors> {
 
     return Scaffold(
                  backgroundColor: Colors.black,
-
+appBar: AppBar(
+        title: const Text('Tutor'),
+        backgroundColor: Color.fromARGB(60, 140, 139, 139),
+      ),
        body:tutorsList.isEmpty ?
         Center(
               child: Text(titlecenter,
