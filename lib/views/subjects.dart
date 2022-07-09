@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import '../model/user.dart';
+import 'package:my_tutor1/model/user.dart';
 //import '../models/tutors.dart';
 import 'package:my_tutor1/model/config.dart';
 import 'package:my_tutor1/model/subject.dart';
@@ -8,30 +9,38 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'package:my_tutor1/views/cartscreen.dart';
 
 
 class Subjects extends StatefulWidget {
-    late final User user;
+     
+  final User user;
+
+  const Subjects({Key? key, required this.user}) : super(key: key);
 
   @override
   State<Subjects> createState() => _SubjectsState();
 }
 
 class _SubjectsState extends State<Subjects> {
+  
   List<listSubjects> subjectList = <listSubjects>[]; //list subject is  dart (json convert dart)
   String titlecenter = "Loading";
     String search = "";
   TextEditingController searchController = TextEditingController();
+int cart = 0;
 
     late double screenHeight, screenWidth, resWidth;
       var numofpage, curpage = 1;
   var color;
 
+ 
 
 
   @override
   void initState() {
     super.initState();
+   
     _loadSubjects(1, search);
   }
 
@@ -64,6 +73,29 @@ class _SubjectsState extends State<Subjects> {
             },
           ),
           
+
+          TextButton.icon(
+            onPressed: () {
+                         
+
+              Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => CartScreen(
+                            user:widget.user,
+                            )));
+                _loadSubjects(1, search);
+                   _loadMyCart();
+              },
+            
+            icon: const Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
+            label: Text(widget.user.cart.toString(),
+                style: const TextStyle(color: Colors.white)),
+          ),
+
         ],
       ),
        body:subjectList.isEmpty ?
@@ -76,51 +108,6 @@ class _SubjectsState extends State<Subjects> {
 
               const Text("Recommend ",textAlign: TextAlign.left,style: const TextStyle(
                       fontSize: 18, color: Colors.white,fontWeight: FontWeight.bold,)),
-
- /*Container(
-                width: double.infinity,
-                height: 150,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  // ignore: prefer_const_constructors
-                  image: DecorationImage(
-                   alignment: Alignment.center,
-                    image: AssetImage('assets/images/1.jpg'),
-                    fit: BoxFit.cover
-                  )
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withOpacity(.4),
-                        Colors.black.withOpacity(.2),
-                      ]
-                    )
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text("Subject available", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 15,),
-                      Container(
-                        height: 20,
-                        margin: EdgeInsets.symmetric(horizontal: 40),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white
-                        ),
-                        child: Center(child: Text("Learn Now", style: TextStyle(color: Colors.grey[900], fontWeight: FontWeight.bold),)),
-                      ),
-
-                      
-                      SizedBox(height: 30,),
-                    ],
-                  ),
-                ),
-              ),*/
 
 
 
@@ -196,6 +183,8 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold),
                                       ),
+                                      Row(
+                                        children:[
                                       Text("RM " +
                                           double.parse(subjectList[index]
                                                   .subjectPrice
@@ -204,12 +193,14 @@ const Text("Subject List ",textAlign: TextAlign.left,style: const TextStyle(
                                      /* Text(subjectList[index]
                                               .subjectDesc
                                               .toString() ),*/
-                                      Text(subjectList[index]
-                                          .subjectSessions
-                                          .toString()+" Sessions"),
-                                           Text(subjectList[index]
-                                              .subjectRating
-                                              .toString()+" Rating" )
+                                        
+                                            IconButton(
+                                                  onPressed: () {
+                                                   _addtocartDialog(index);
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.shopping_cart )),
+                                     ] ),           
                                     ],
                                   ))
                             ],
@@ -382,11 +373,134 @@ void _loadSearchDialog() {
               ],
             )),
            
+              actions: [
+              SizedBox(
+                  width: screenWidth / 1,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        _addtocartDialog(index);
+                      },
+                      child: const Text("Add to cart"))),
+            ],
           );
         });
   }
 
 
+  _addtocartDialog(int index) {
+   showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: const Text(
+            "Add to cart",
+            style: TextStyle(),
+          ),
+          content: const Text("Are you sure?", style: TextStyle()),
+          actions: <Widget>[
+          
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () async {
+          _addtoCart(index);
+           // add(index);
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  
 
+
+      
+    
+  }
+void _loadMyCart() {
+  
+      // ignore: avoid_single_cascade_in_expression_statements
+      http.post( 
+        Uri.parse(MyConfig.server + "/my_tutor1/xx/php/load_mycartqty.php"),
+         body: {
+            "email": widget.user.email.toString(),
+          }).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          return http.Response(
+              'Error', 408); // Request Timeout response status code
+        },
+      ).then((response) {
+
+    
+        var jsondata = jsonDecode(response.body);
+        if (response.statusCode == 200 && jsondata['status'] == 'success') {
+          print(jsondata['data']['carttotal'].toString());
+          setState(() {
+            widget.user.cart = jsondata['data']['carttotal'].toString();
+          });
+        }
+      });
+    
+  }
+
+
+
+
+  void _addtoCart(int index) {
+
+    http.post(
+        Uri.parse(MyConfig.server + "/my_tutor1/xx/php/insert_cart.php"),
+        body: {
+          "email": widget.user.email.toString(),
+          "subid": subjectList[index].subjectId.toString(),
+        }).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        return http.Response(
+            'Error', 408); // Request Timeout response status code
+      },
+    ).then((response) {
+      print(response.body);
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        print(jsondata['data']['carttotal'].toString());
+        setState(() {
+          widget.user.cart = jsondata['data']['carttotal'].toString();
+        });
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+
+             Navigator.of(context).pop();
+               Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => CartScreen(
+                           user: widget.user,)));
+      }
+
+      
+               
+    });
+
+    
+  }
 
 }

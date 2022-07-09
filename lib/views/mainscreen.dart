@@ -23,6 +23,8 @@ class _MainScreenState extends State<MainScreen> {
   String maintitle = "Subjects";
   late double screenHeight, screenWidth, resWidth;
 
+    
+
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
 
     List<Widget> _pages = <Widget>[
-      Subjects(),
+     Subjects(user:widget.user),
      Tutors(),
      Icon(Icons.subscript, size: 150,),
   Icon(Icons.favorite,size: 150,),

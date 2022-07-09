@@ -6,17 +6,18 @@ class User {
   String? phone;
  String? address;
   String? datereg;
+    String? cart;
 
 
   User(
-      {required this.id,
-      required this.name,
-      required this.email,
+      {this.id,
+       this.name,
+      this.email,
 
-      required this.phone,
-      required this.address,
-      required this.datereg,
-   
+       this.phone,
+       this.address,
+      this.datereg,
+   this.cart
       });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class User {
    phone = json['phone'];
     address = json['address'];
    datereg = json['datereg'];
+        cart = json['cart'].toString();
 
 
   }
@@ -38,6 +40,8 @@ class User {
     data['phone'] = phone;
     data['datereg'] = datereg;
      data['address'] = address;
+       data['cart'] = cart.toString();
+
     return data;
   }
 }

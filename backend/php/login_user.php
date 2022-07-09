@@ -20,7 +20,7 @@ $result = $conn->query($sqllogin);    //mysqli_query function= The function can 
     
 while ($row = $result->fetch_assoc()) { //   //Fetching all the rows as arrays
 
-$user['id'] = $row['user_id'];
+$user['id'] = $row['user_id'];      //id is to model user ,row is frm database
 $user['name'] = $row['user_name'];
 $user['email'] = $row['user_email'];
 $user['phone'] = $row['user_phone'];
@@ -28,6 +28,16 @@ $user['address'] = $row['user_address'];
 $user['datereg'] = $row['user_datereg'];
 
 }
+$sqlgetqty = "SELECT * FROM tbl_carts WHERE user_email = '$email' AND cart_status IS NULL";
+    $result = $conn->query($sqlgetqty);
+    $number_of_result = $result->num_rows;
+    $carttotal = 0;
+    while($row = $result->fetch_assoc()) {
+        $carttotal = $row['cart_qty'] + $carttotal;
+    }
+    $mycart = array();
+    $customer['cart'] =$carttotal;
+
 $response =array('status' => 'success','data' => $user);//put data in user class
 sendJsonResponse($response);
 

@@ -13,7 +13,7 @@ $search = $_POST['search'];
 
 $page_first_result = ($pageno - 1) * $results_per_page; ////Page1 - A to J (1-10)    Page 2 - K to T (11-20)
 
-$sqlloadsubjects = "SELECT * FROM tbl_subjects WHERE subject_name LIKE '%$search%' ORDER BY subject_id DESC";
+$sqlloadsubjects = "SELECT * FROM tbl_subjects WHERE subject_name LIKE '%$search%' ";
 
 //$sqlloadsubjects = "SELECT * FROM tbl_subjects";
 $result = $conn->query($sqlloadsubjects);
